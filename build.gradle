@@ -4,9 +4,11 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath "io.realm:realm-gradle-plugin:1.1.0"
     }
 }
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 repositories {
     jcenter()
@@ -50,10 +52,9 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile ':kinvey-android:3.0.0@aar'
     compile 'com.android.support:appcompat-v7:23.1.1'
-    compile(name:'kinvey-android-lib-2.10.4', ext:'aar')
     compile 'com.facebook.android:facebook-android-sdk:4.8.1'
     compile 'com.google.android.gms:play-services:8.3.0'
-    compile 'com.android.support:multidex:1.0.0'
 
 }
