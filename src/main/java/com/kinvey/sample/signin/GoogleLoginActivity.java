@@ -26,10 +26,13 @@ import android.widget.Toast;
 import com.google.android.gms.common.AccountPicker;
 import com.kinvey.android.Client;
 import com.kinvey.android.callback.KinveyUserCallback;
-import com.kinvey.java.User;
+import com.kinvey.android.store.UserStore;
+import com.kinvey.java.dto.User;
 import com.textuality.authorized.AuthorizedActivity;
 import com.textuality.authorized.Response;
 import com.textuality.authorized.ResponseHandler;
+
+import java.io.IOException;
 
 public class GoogleLoginActivity extends AuthorizedActivity {
 
@@ -84,6 +87,8 @@ public class GoogleLoginActivity extends AuthorizedActivity {
 
                             } catch (JSONException je) {
                                 throw new RuntimeException(je);
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
                         }
 
@@ -91,10 +96,10 @@ public class GoogleLoginActivity extends AuthorizedActivity {
         }
     }
 
-    private void loginGoogleKinveyUser() {
+    private void loginGoogleKinveyUser() throws IOException {
 
-        mKinveyClient.user().loginGoogle(getAuthToken(),
-                new KinveyUserCallback() {
+        UserStore.loginGoogle(getAuthToken(), mKinveyClient,
+                new KinveyUserCallback<User>() {
 
                     public void onFailure(Throwable e) {
                         Log.e(TAG, "Failed Kinvey login", e);

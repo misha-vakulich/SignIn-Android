@@ -26,11 +26,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
-import com.google.api.client.json.GenericJson;
 import com.kinvey.android.Client;
-import com.kinvey.android.callback.KinveyListCallback;
 import com.kinvey.android.callback.KinveyUserCallback;
-import com.kinvey.java.User;
+import com.kinvey.android.store.UserStore;
+import com.kinvey.java.dto.User;
+
+import java.io.IOException;
+
 import oauth.signpost.OAuth;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
@@ -300,9 +302,9 @@ public class LinkedinLoginActivity extends AccountAuthenticatorActivity{
          *
          * Method to log the linked Kinvey user, passing a KinveyCallback.
          */
-        private void loginTwitterKinveyUser(String accessToken, String accessSecret) {
-            kinveyClient.user().loginLinkedIn(accessToken, accessSecret, LINKEDIN_CONSUMER_KEY,
-                    LINKEDIN_CONSUMER_SECRET, new KinveyUserCallback() {
+        private void loginTwitterKinveyUser(String accessToken, String accessSecret) throws IOException {
+            UserStore.loginLinkedIn(accessToken, accessSecret, LINKEDIN_CONSUMER_KEY,
+                    LINKEDIN_CONSUMER_SECRET, kinveyClient, new KinveyUserCallback<User>() {
 
                 public void onFailure(Throwable e) {
                     CharSequence text = "Wrong username or password";

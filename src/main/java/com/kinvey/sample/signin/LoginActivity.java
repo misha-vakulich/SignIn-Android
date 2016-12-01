@@ -20,7 +20,8 @@ import android.accounts.AccountManager;
 
 import com.kinvey.android.Client;
 import com.kinvey.android.callback.KinveyUserCallback;
-import com.kinvey.java.User;
+import com.kinvey.android.store.UserStore;
+import com.kinvey.java.dto.User;
 
 import android.os.Bundle;
 import android.app.Dialog;
@@ -33,6 +34,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View;
+
+import java.io.IOException;
 
 /**
  * 
@@ -128,7 +131,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 			mErrorMessage.setText("Please enter a valid username and password.");
 		} else {
 			showProgress();
-			userLogin();
+			try {
+				userLogin();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -234,24 +241,24 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	 * 
 	 * Method to log the twitter Kinvey user, passing a KinveyCallback.  
 	 */
-	public void userLogin() {
-		kinveyClient.user().login(mEditUserEmail.getText().toString(), mEditPassword.getText().toString(), new KinveyUserCallback() {
-            public void onFailure(Throwable t) {
+	public void userLogin() throws IOException {
+		UserStore.login(mEditUserEmail.getText().toString(), mEditPassword.getText().toString(), kinveyClient, new KinveyUserCallback<User>() {
+			@Override
+			public void onSuccess(User u) {
+				CharSequence text = "Logged in.";
+				Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+				onAuthenticationResult(u.getId());
+				LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
+				LoginActivity.this.finish();
+			}
+
+			public void onFailure(Throwable t) {
                 CharSequence text = "Wrong username or password";
                 Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.show();
                 onAuthenticationResult(null);
             }
-
-            public void onSuccess(User u) {
-                CharSequence text = "Logged in.";
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
-                onAuthenticationResult(u.getId());
-                LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                LoginActivity.this.finish();
-            }
-
         });
 	}
 }

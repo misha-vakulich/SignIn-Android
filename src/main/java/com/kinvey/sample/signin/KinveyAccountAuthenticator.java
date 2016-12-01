@@ -14,7 +14,8 @@
 package com.kinvey.sample.signin;
 
 import com.kinvey.android.Client;
-import com.kinvey.java.User;
+import com.kinvey.java.dto.User;
+import com.kinvey.java.store.BaseUserStore;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -91,8 +92,8 @@ public class KinveyAccountAuthenticator extends AbstractAccountAuthenticator {
 		
 		if (password !=null) {
             User ku;
-            try {
-			    ku = kinveyClient.user().loginBlocking(account.name, password).execute();
+			try {
+			    ku = BaseUserStore.login(account.name, password, kinveyClient);
                 // TODO make async
             } catch (IOException ex) {ku=null;}
 			
@@ -100,7 +101,7 @@ public class KinveyAccountAuthenticator extends AbstractAccountAuthenticator {
 				final Bundle result = new Bundle();
 				result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
 				result.putString(AccountManager.KEY_ACCOUNT_TYPE, "com.kinvey.myapplogin");
-				result.putString(AccountManager.KEY_AUTHTOKEN, ku.getId());
+				result.putString(AccountManager.KEY_AUTHTOKEN, ku.getAuthToken());
 				return result;
 			}
 			

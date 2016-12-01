@@ -16,7 +16,8 @@ package com.kinvey.sample.signin;
 
 import com.kinvey.android.Client;
 import com.kinvey.android.callback.KinveyUserCallback;
-import com.kinvey.java.User;
+import com.kinvey.android.store.UserStore;
+import com.kinvey.java.dto.User;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -101,24 +102,25 @@ public class RegisterNewAccountActivity extends Activity {
 	 */
 	public void processSignup(View view) {
 		Toast.makeText(this, "Creating user...", Toast.LENGTH_SHORT).show();
-	    kinveyClient.user().create(mEditEmailAddress.getText().toString(), mEditPassword.getText().toString(), new KinveyUserCallback() {
-            public void onFailure(Throwable t) {
-                CharSequence text = "Could not sign up -> " + t.getMessage();
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Sign-up error", t);
-            }
+	    UserStore.signUp(mEditEmailAddress.getText().toString(), mEditPassword.getText().toString(), kinveyClient, new KinveyUserCallback<User>() {
+			@Override
+			public void onSuccess(User u) {
+				CharSequence text = "Welcome," + u.get("username") + ".  Your account has been registered.  Please login to confirm your credentials.";
+				u.put("email", u.get("username"));
+				u.put("firstname", mEditFirstName.getText().toString());
+				u.put("lastname", mEditLastName.getText().toString());
 
-            public void onSuccess(User u) {
-                CharSequence text = "Welcome," + u.get("username") + ".  Your account has been registered.  Please login to confirm your credentials.";
-                u.put("email", u.get("username"));
-                u.put("firstname", mEditFirstName.getText().toString());
-                u.put("lastname", mEditLastName.getText().toString());
+				Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+				startActivity(new Intent(RegisterNewAccountActivity.this, LoginActivity.class));
+				finish();
+			}
 
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
-                RegisterNewAccountActivity.this.startActivity(new Intent(RegisterNewAccountActivity.this, LoginActivity.class));
-                RegisterNewAccountActivity.this.finish();
-
-            }
-        });
+			@Override
+			public void onFailure(Throwable t) {
+				CharSequence text = "Could not sign up -> " + t.getMessage();
+				Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+				Log.e(TAG, "Sign-up error", t);
+			}
+		});
 	}
 }

@@ -35,9 +35,11 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.kinvey.android.Client;
 import com.kinvey.android.callback.KinveyUserCallback;
-import com.kinvey.java.User;
+import com.kinvey.android.store.UserStore;
+import com.kinvey.java.dto.User;
 import com.textuality.authorized.AuthorizedActivity;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -77,8 +79,12 @@ public class FacebookLoginActivity extends AccountAuthenticatorActivity {
             Toast.makeText(FacebookLoginActivity.this, "Logged in with Facebook.",
                     Toast.LENGTH_LONG).show();
 
-            loginFacebookKinveyUser(loginProgressDialog, loginResult.getAccessToken().getToken());
-        }
+			try {
+				loginFacebookKinveyUser(loginProgressDialog, loginResult.getAccessToken().getToken());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
         @Override
         public void onCancel() {
@@ -132,9 +138,9 @@ public class FacebookLoginActivity extends AccountAuthenticatorActivity {
     /*
      * Login a Kinvey User with Faceook credentials
      */
-	private void loginFacebookKinveyUser(final ProgressDialog progressDialog, String accessToken) {
+	private void loginFacebookKinveyUser(final ProgressDialog progressDialog, String accessToken) throws IOException {
 	
-		kinveyClient.user().loginFacebook(accessToken, new KinveyUserCallback() {
+		UserStore.loginFacebook(accessToken, kinveyClient, new KinveyUserCallback<User>() {
 
             @Override
             public void onFailure(Throwable e) {

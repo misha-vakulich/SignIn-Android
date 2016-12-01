@@ -16,7 +16,8 @@ package com.kinvey.sample.signin;
 
 import com.kinvey.android.Client;
 import com.kinvey.android.callback.KinveyUserCallback;
-import com.kinvey.java.User;
+import com.kinvey.android.store.UserStore;
+import com.kinvey.java.dto.User;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -31,6 +32,9 @@ import android.widget.Toast;
 import android.content.Context;
 import android.content.Intent; 
 import android.net.Uri;
+
+import java.io.IOException;
+
 import oauth.signpost.OAuth;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
@@ -302,10 +306,10 @@ public class TwitterLoginActivity extends AccountAuthenticatorActivity {
 		 * 
 		 * Method to log the twitter Kinvey user, passing a KinveyCallback.  
 		 */
-		private void loginTwitterKinveyUser(String accessToken, String accessSecret) {
+		private void loginTwitterKinveyUser(String accessToken, String accessSecret) throws IOException {
 				
-				kinveyClient.user().loginTwitter(accessToken, accessSecret, TWITTER_CONSUMER_KEY,
-                        TWITTER_CONSUMER_SECRET, new KinveyUserCallback() {
+				UserStore.loginTwitter(accessToken, accessSecret, TWITTER_CONSUMER_KEY,
+                        TWITTER_CONSUMER_SECRET, kinveyClient, new KinveyUserCallback<User>() {
 
                     public void onFailure(Throwable e) {
                         CharSequence text = "Wrong username or password";
